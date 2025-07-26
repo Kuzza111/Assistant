@@ -1,0 +1,6 @@
+plugins: # Загружаемые плагины (добавьте свои)
+  - input_terminal
+  - output_terminal
+required_plugins: # Обязательные (если не загружены — ошибка)
+  - input_terminal  
+  - output_terminal
