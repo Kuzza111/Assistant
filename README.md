@@ -18,14 +18,14 @@ project/
 │   └── plugin_base.py     # Base class for plugins
 ├── plugins/               # Directory for all plugins (built-in and user-defined)
 │   └── example_plugin.py  # Example plugin
-├── config.yaml            # Configuration file (list of plugins and settings)
+├── config.json            # Configuration file (list of plugins and settings)
 ├── main.py                # Entry point for launching
 └── README.md              # This file
 ```
 
 - **Core**: Minimal core responsible for loading, management, and coordination.
 - **Plugins**: All functionality is implemented as plugins (no separate directory for "modules" — everything is unified for maximum flexibility).
-- **Config**: YAML file for configuration (e.g., which plugins to load).
+- **Config**: JSON file for configuration (e.g., which plugins to load).
 
 ### How the System Works Overall
 
