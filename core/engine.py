@@ -1,21 +1,25 @@
 import os
 import importlib
-import yaml  # Для чтения config.yaml
+import json # Для чтения конфига
 from .event_bus import EventBus
 from .plugin_base import PluginBase
 
 class Engine:
-    def __init__(self, config_path='config.yaml'):
+    def __init__(self, config_path='config.json'):
         self.event_bus = EventBus()
-        self.plugins = {}  # {name: plugin_instance}
+        self.plugins = {}
         self.config = self._load_config(config_path)
+        self.running = False
 
     def _load_config(self, path):
-        """Загрузка конфигурации из YAML."""
+        """Загрузка конфигурации из JSON"""
         if not os.path.exists(path):
             raise FileNotFoundError(f"Config file not found: {path}")
-        with open(path, 'r') as f:
-            return yaml.safe_load(f) or {}
+        try:
+            with open(path, 'r') as f:
+                return json.load(f) or {}
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in config: {e}")
 
     def register_plugin(self, name, plugin):
         """Регистрация плагина."""
