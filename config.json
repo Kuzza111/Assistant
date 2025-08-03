@@ -1,0 +1,4 @@
+{
+  "plugins": ["console_input", "console_output"],
+  "required_plugins": ["console_input", "console_output"]
+}
