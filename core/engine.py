@@ -1,6 +1,6 @@
 import os
 import importlib
-import json # Для чтения конфига
+import json
 from .event_bus import EventBus
 from .plugin_base import PluginBase
 
@@ -28,7 +28,7 @@ class Engine:
         if name in self.plugins:
             raise ValueError(f"Plugin '{name}' already registered")
         self.plugins[name] = plugin
-        plugin.init(self)  # Инициализация
+        plugin.init(self)
         self.event_bus.publish('plugin_registered', {'name': name})
 
     def load_plugins(self, plugin_dir='plugins'):
@@ -37,7 +37,6 @@ class Engine:
         for plugin_name in plugins_to_load:
             self._load_single_plugin(plugin_name, plugin_dir)
 
-        # Проверка required_plugins
         required = set(self.config.get('required_plugins', []))
         loaded = set(self.plugins.keys())
         missing = required - loaded
@@ -49,9 +48,18 @@ class Engine:
         try:
             module_path = f'{plugin_dir}.{plugin_name}'
             mod = importlib.import_module(module_path)
-            plugin_class = getattr(mod, 'Plugin', None)
+            
+            plugin_class = None
+            for name, obj in vars(mod).items():
+                if (isinstance(obj, type) and 
+                    issubclass(obj, PluginBase) and 
+                    obj is not PluginBase):
+                    plugin_class = obj
+                    break
+            
             if not plugin_class:
-                raise AttributeError(f"No 'Plugin' class in {module_path}")
+                raise AttributeError(f"No PluginBase subclass found in {module_path}")
+            
             plugin = plugin_class()
             self.register_plugin(plugin_name, plugin)
         except (ImportError, AttributeError) as e:
@@ -71,37 +79,24 @@ class Engine:
 
     def shutdown(self):
         """Завершение работы: shutdown всех плагинов."""
+        self.running = False
         for name in list(self.plugins.keys()):
-            self.remove_plugin(name)  # Используем remove для hotswap-логики
+            self.remove_plugin(name)
         self.event_bus.publish('system_shutdown')
 
     def run(self):
-        """Основной цикл приложения. Для примера: симуляция ввода через консоль."""
+        """Основной цикл приложения."""
+        self.running = True
         self.event_bus.publish('system_startup')
-        print("Engine running. Type commands (e.g., 'input: hello') or 'add <plugin>' or 'remove <plugin>' or 'exit'.")
-        while True:
-            user_input = input("> ").strip()
-            if user_input == 'exit':
-                break
-            elif user_input.startswith('add '):
-                plugin_name = user_input.split(' ', 1)[1]
+        print("System started. Type 'exit' to shutdown")
+        
+        try:
+            while self.running:
                 try:
-                    self.add_plugin(plugin_name)
-                    print(f"Plugin '{plugin_name}' added.")
-                except ValueError as e:
-                    print(e)
-            elif user_input.startswith('remove '):
-                plugin_name = user_input.split(' ', 1)[1]
-                try:
-                    self.remove_plugin(plugin_name)
-                    print(f"Plugin '{plugin_name}' removed.")
-                except ValueError as e:
-                    print(e)
-            elif user_input.startswith('input: '):
-                data = user_input.split(':', 1)[1].strip()
-                self.event_bus.publish('user_input', {'text': data})
-            else:
-                print("Unknown command.")
-
-        self.shutdown()
-        print("Engine shutdown.")
+                    user_input = input("> ").strip()
+                    self.event_bus.publish('user_input', user_input)
+                except (EOFError, KeyboardInterrupt):
+                    self.running = False
+        finally:
+            self.shutdown()
+            print("Engine shutdown")

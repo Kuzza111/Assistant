@@ -1,4 +1,4 @@
 {
-  "plugins": ["console_input", "console_output"],
-  "required_plugins": ["console_input", "console_output"]
+  "plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin"],
+  "required_plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin"]
 }
