@@ -6,7 +6,7 @@ from core.plugin_base import PluginBase
 
 class CameraCapturePlugin(PluginBase):
     def init(self, core):
-        self.core = core  # Сохраняем ссылку на ядро
+        self.core = core
         self.capture_thread = None
         self.running = False
         self.camera_index = 0  # Индекс камеры по умолчанию
@@ -18,27 +18,25 @@ class CameraCapturePlugin(PluginBase):
         self.start_capture()
 
     def start_capture(self):
-        """Запускает поток захвата изображений с камеры"""
         if self.capture_thread and self.capture_thread.is_alive():
             return
             
         self.cap = cv2.VideoCapture(self.camera_index)
         if not self.cap.isOpened():
-            self.core.event_bus.publish('output', f"❌ CameraCapturePlugin: Cannot open camera {self.camera_index}")
+            self.core.event_bus.publish('output', f"CameraCapturePlugin: Cannot open camera {self.camera_index}")
             return
             
         self.running = True
         self.capture_thread = threading.Thread(target=self.capture_loop)
         self.capture_thread.daemon = True
         self.capture_thread.start()
-        self.core.event_bus.publish('output', f"✅ CameraCapturePlugin: Started capturing from camera {self.camera_index}")
+        self.core.event_bus.publish('output', f"CameraCapturePlugin: Started capturing from camera {self.camera_index}")
 
-    def capture_loop(self):
-        """Основной цикл захвата кадров"""
+    def capture_loop(self): # main loop
         while self.running:
             ret, frame = self.cap.read()
             if not ret:
-                self.core.event_bus.publish('output', "⚠️ CameraCapturePlugin: Failed to capture frame")
+                self.core.event_bus.publish('output', "CameraCapturePlugin: Failed to capture frame")
                 time.sleep(1)
                 continue
                 
@@ -52,8 +50,7 @@ class CameraCapturePlugin(PluginBase):
                 }
             )
             
-            # Ограничение FPS (~30 кадров/сек)
-            time.sleep(0.033)
+            time.sleep(0.033) # ~30 FPS
 
     def on_shutdown(self, event_data):
         """Обработчик завершения работы системы"""
@@ -66,7 +63,6 @@ class CameraCapturePlugin(PluginBase):
             self.capture_thread.join(timeout=1.0)
         if hasattr(self, 'cap'):
             self.cap.release()
-        self.core.event_bus.publish('output', "✅ CameraCapturePlugin shutdown")
+        self.core.event_bus.publish('output', "CameraCapturePlugin shutdown")
 
-# Для совместимости с загрузчиком
-Plugin = CameraCapturePlugin
+Plugin = CameraCapturePlugin # не обязательно, но можно оставить для совместимости с загрузчиком

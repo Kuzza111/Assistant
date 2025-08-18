@@ -1,4 +1,4 @@
 {
-  "plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin"],
+  "plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin", "KeyboardControlPlugin"],
   "required_plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin"]
 }

@@ -14,7 +14,7 @@ class PluginManagerPlugin(PluginBase):
             self.handle_add(user_input[4:])
         elif user_input.startswith(('remove ', 'rm ')):
             plugin_name = user_input.split(maxsplit=1)[1]
-            self.handle_remove(plugin_name)
+            self.handle_remove(plugin_name) # надо добавить ls для просмотра списка команд и / или плагинов
     
     def handle_add(self, plugin_name):
         try:

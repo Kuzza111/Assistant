@@ -17,8 +17,8 @@ class ConsoleOutputPlugin(PluginBase):
 
     def handle_system_event(self, event_type):
         messages = {
-            'system_startup': "🚀 System started",
-            'system_shutdown': "🛑 System shutting down"
+            'system_startup': "System started",
+            'system_shutdown': "System shutting down"
         }
         print(messages.get(event_type, f"System event: {event_type}"))
 
