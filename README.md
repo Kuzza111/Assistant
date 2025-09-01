@@ -1,7 +1,7 @@
-Modular assistanr for your PC and more!
-# AI Assistant project
+Modular assistant for your PC and more!
+# Assistant project
 
-The AI Assistant is designed to help users with everyday and technical tasks by controlling a PC or other headless devices (e.g., robots, embedded systems, or servers).
+The Assistant is designed to help users with everyday and technical tasks by controlling a PC or other headless devices (e.g., robots, embedded systems, or servers).
 
 ## Architecture
 
@@ -17,7 +17,7 @@ project/
 │   ├── event_bus.py       # Event bus
 │   └── plugin_base.py     # Base class for plugins
 ├── plugins/               # Directory for all plugins (built-in and user-defined)
-│   └── example_plugin.py  # Example plugin
+│   └── ExamplePlugin.py   # Example plugin
 ├── config.json            # Configuration file (list of plugins and settings)
 ├── main.py                # Entry point for launching
 └── README.md              # This file
@@ -34,7 +34,7 @@ project/
     - User inputs a command → Publication of `user_input`.
     - A plugin (e.g., AI) processes it and publishes `action_execute`.
     - An action plugin executes (e.g., mouse click).
-3. **Hotswap Example**: In runtime: `engine.add_plugin('new_ai_plugin')` — the plugin is loaded, initialized, and starts listening for events.
+3. **Hotswap Example**: In runtime: `engine.add_plugin('NewPlugin')` — the plugin is loaded, initialized, and starts listening for events.
 4. **Termination**: `shutdown()` for all components.
 
 # Plugin Development Guide
@@ -51,7 +51,7 @@ This documentation explains how to create and integrate plugins into the system.
 
 1. **Create a File in the `/plugins/` Directory**:
     
-    - File name: `<your_plugin_name>.py` (e.g., `my_input_plugin.py`).
+    - File name: `<YourPluginName>.py` (e.g., `myInputPlugin.py`).
     - The file must contain a class `Plugin` that inherits from `core.plugin_base.PluginBase`.
 2. **Implement the Base Class**:
 
@@ -72,7 +72,7 @@ class Plugin(PluginBase):
     def my_handler(self, data):
         print(f"Handled data: {data}")
         # Publish a new event
-        core.event_bus.publish('new_event', {'key': 'value'}, run_async=True)
+        core.event_bus.publish('new_event', {'key': 'value'}, async_mode=True)
 ```
 
 ## Best Practices: Managing Threads and Shared Resources
@@ -124,4 +124,4 @@ class Plugin(PluginBase):
 
 ---
 
-Don't forget about protection, no one knows what AI will decide to do with your devices or you :3
+If you use AI to control system - don't forget about protection, no one knows what AI will decide to do with your devices or you :3
