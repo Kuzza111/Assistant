@@ -1,4 +1,23 @@
 {
-  "plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin", "KeyboardControlPlugin"],
-  "required_plugins": ["ConsoleInputPlugin", "ConsoleOutputPlugin", "PluginManagerPlugin", "SystemCommandsPlugin", "InputHandlerPlugin"]
+  "plugins": [
+    "ConsoleInputPlugin", 
+    "ConsoleOutputPlugin", 
+    "PluginManagerPlugin", 
+    "SystemCommandsPlugin", 
+    "InputHandlerPlugin",
+    "DebugEventPlugin"],
+  "required_plugins": [
+    "ConsoleInputPlugin", 
+    "ConsoleOutputPlugin", 
+    "PluginManagerPlugin", 
+    "SystemCommandsPlugin", 
+    "InputHandlerPlugin"],
+  "ai_settings": {
+    "provider": "",
+    "api_key": "",
+    "model": "",
+    "max_tokens": 1000,
+    "temperature": 0.7
+  },
+  "yolo_confidence": 0.6
 }
