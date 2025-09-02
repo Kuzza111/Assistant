@@ -1,141 +1,153 @@
-import threading
+import pyautogui
 import time
-import tkinter as tk
 from core.plugin_base import PluginBase
 
 class KeyboardControlPlugin(PluginBase):
     def init(self, core):
         self.core = core
-        self.root = None
-        self.thread = None
-        self.running = False
-        self.shutdown_requested = False
-        self.key_states = {}  # Словарь состояний клавиш
         
-        # Подписка на системные события
+        # Настройки безопасности
+        pyautogui.FAILSAFE = True
+        pyautogui.PAUSE = 0.05  # Меньшая пауза для клавиатуры
+        
+        # Подписка на события клавиатуры
+        core.event_bus.subscribe('keyboard_type', self.handle_type)
+        core.event_bus.subscribe('keyboard_press', self.handle_press)
+        core.event_bus.subscribe('keyboard_hotkey', self.handle_hotkey)
+        core.event_bus.subscribe('keyboard_hold', self.handle_hold)
+        
+        # Системные события
         core.event_bus.subscribe('system_shutdown', self.on_shutdown)
         
-        # Запуск потока управления окном
-        self.start_window_thread()
+        # Словарь алиасов клавиш (только там, где нужно преобразование)
+        self.key_aliases = {
+            'enter': 'enter',
+            'return': 'enter', 
+            'space': 'space',
+            'spacebar': 'space',
+            'escape': 'esc',
+            'esc': 'esc',
+            'backspace': 'backspace',
+            'del': 'delete',
+            'delete': 'delete',
+            'pageup': 'pageup',
+            'pagedown': 'pagedown',
+            'pgup': 'pageup',
+            'pgdn': 'pagedown',
+            'ctrl': 'ctrl',
+            'control': 'ctrl',
+            'alt': 'alt',
+            'shift': 'shift',
+            'win': 'win',
+            'windows': 'win',
+            'cmd': 'cmd',
+            'command': 'cmd'
+        }
+        
+        self.core.event_bus.publish('output', "⌨KeyboardControlPlugin initialized")
 
-    def start_window_thread(self):
-        """Запускает поток с GUI для управления клавиатурой"""
-        if self.thread and self.thread.is_alive():
-            return
+    def handle_type(self, data):
+        """Печать текста
+        data: {'text': str, 'interval': float (optional)}
+        """
+        try:
+            text = data.get('text', '')
+            interval = data.get('interval', 0.05)
             
-        self.running = True
-        self.thread = threading.Thread(target=self.create_window)
-        self.thread.daemon = True
-        self.thread.start()
-        
-        # Асинхронная публикация сообщения о запуске
-        self.core.event_bus.publish(
-            'output', 
-            "KeyboardControlPlugin: Started keyboard control window",
-            async_mode=True
-        )
-
-    def create_window(self):
-        """Создает минимальное окно для захвата событий клавиатуры"""
-        self.root = tk.Tk()
-        self.root.title("Keyboard Control")
-        self.root.geometry("100x100")  # Минимальный размер
-        self.root.resizable(False, False)
-        
-        # Фокус на окно для захвата событий
-        self.root.focus_set()
-        
-        # Привязка обработчиков клавиш
-        self.root.bind('<KeyPress>', self.on_key_press)
-        self.root.bind('<KeyRelease>', self.on_key_release)
-        self.root.protocol("WM_DELETE_WINDOW", self.on_window_close)
-        
-        # Периодическая проверка флага завершения
-        self.root.after(100, self.check_shutdown)
-        
-        self.root.mainloop()
-
-    def check_shutdown(self):
-        """Проверяет флаг завершения работы"""
-        if self.shutdown_requested:
-            self.root.destroy()
-        else:
-            self.root.after(100, self.check_shutdown)
-
-    def on_key_press(self, event):
-        """Обрабатывает нажатия клавиш"""
-        key = event.keysym
-        key_code = event.keycode
-        
-        # Определяем состояние (первое нажатие или автоповтор)
-        state = "holded" if key in self.key_states else "pressed"
-        self.key_states[key] = state
-        
-        # Отправка события на шину
-        self.core.event_bus.publish(
-            'keyboard_input',
-            {
-                'key': key,
-                'code': key_code,
-                'state': state,
-                'timestamp': time.time()
-            },
-            async_mode=True
-        )
+            if not text:
+                self.core.event_bus.publish('output', "Keyboard type: no text provided")
+                return
+                
+            pyautogui.write(text, interval=interval)
+            self.core.event_bus.publish('keyboard_typed', {'text': text})
             
-    def on_key_release(self, event):
-        """Обрабатывает отпускания клавиш"""
-        key = event.keysym
-        key_code = event.keycode
-        
-        # Обновляем состояние
-        self.key_states[key] = "released"
-        
-        # Отправка события на шину
-        self.core.event_bus.publish(
-            'keyboard_input',
-            {
-                'key': key,
-                'code': key_code,
-                'state': "released",
-                'timestamp': time.time()
-            },
-            async_mode=True
-        )
+        except Exception as e:
+            self.core.event_bus.publish('output', f"Keyboard type error: {e}")
+
+    def handle_press(self, data):
+        """Нажатие клавиши
+        data: {'key': str, 'presses': int (optional)}
+        """
+        try:
+            key = data.get('key', '')
+            presses = data.get('presses', 1)
             
-        # Удаляем клавишу из состояния после отпускания
-        self.root.after(100, lambda k=key: self.clear_key_state(k))
+            if not key:
+                self.core.event_bus.publish('output', "Keyboard press: no key provided")
+                return
+                
+            # Проверяем алиасы клавиш
+            if key.lower() in self.key_aliases:
+                key = self.key_aliases[key.lower()]
+                
+            pyautogui.press(key, presses=presses)
+            self.core.event_bus.publish('keyboard_pressed', {'key': key, 'presses': presses})
+            
+        except Exception as e:
+            self.core.event_bus.publish('output', f"Keyboard press error: {e}")
 
-    def clear_key_state(self, key):
-        """Удаляет клавишу из состояния"""
-        if key in self.key_states and self.key_states[key] == "released":
-            del self.key_states[key]
+    def handle_hotkey(self, data):
+        """Горячие клавиши (комбинации)
+        data: {'keys': [str] или str (через +)} - например ['ctrl', 'c'] или 'ctrl+c'
+        """
+        try:
+            keys = data.get('keys', [])
+            
+            # Если передана строка, разбираем её
+            if isinstance(keys, str):
+                keys = [k.strip() for k in keys.split('+')]
+            
+            if not keys:
+                self.core.event_bus.publish('output', "Keyboard hotkey: no keys provided")
+                return
+                
+            # Преобразуем ключи через словарь алиасов
+            processed_keys = []
+            for key in keys:
+                processed_key = self.key_aliases.get(key.lower(), key.lower())
+                processed_keys.append(processed_key)
+                
+            pyautogui.hotkey(*processed_keys)
+            self.core.event_bus.publish('keyboard_hotkey_pressed', {'keys': processed_keys})
+            
+        except Exception as e:
+            self.core.event_bus.publish('output', f"Keyboard hotkey error: {e}")
 
-    def on_window_close(self):
-        """Обрабатывает закрытие окна"""
-        self.running = False
-        self.root.destroy()
-        self.core.event_bus.publish(
-            'output', 
-            "KeyboardControlPlugin: Window closed",
-            async_mode=True
-        )
+    def handle_hold(self, data):
+        """Удержание клавиши
+        data: {'key': str, 'duration': float}
+        """
+        try:
+            key = data.get('key', '')
+            duration = data.get('duration', 1.0)
+            
+            if not key:
+                self.core.event_bus.publish('output', "Keyboard hold: no key provided")
+                return
+                
+            # Проверяем алиасы
+            if key.lower() in self.key_aliases:
+                key = self.key_aliases[key.lower()]
+                
+            pyautogui.keyDown(key)
+            time.sleep(duration)
+            pyautogui.keyUp(key)
+            
+            self.core.event_bus.publish('keyboard_held', {'key': key, 'duration': duration})
+            
+        except Exception as e:
+            self.core.event_bus.publish('output', f"Keyboard hold error: {e}")
+
+    def get_available_aliases(self):
+        """Возвращает список доступных алиасов клавиш"""
+        return list(self.key_aliases.keys())
 
     def on_shutdown(self, event_data):
-        """Обработчик завершения работы системы"""
         self.shutdown()
 
     def shutdown(self):
-        """Остановка плагина и освобождение ресурсов"""
-        self.shutdown_requested = True
-        self.running = False
-        
-        if self.thread and self.thread.is_alive():
-            self.thread.join(timeout=0.5)
-        
-        self.core.event_bus.publish(
-            'output', 
-            "KeyboardControlPlugin shutdown"
-        )
+        """Очистка ресурсов"""
+        self.core.event_bus.publish('output', "⌨KeyboardControlPlugin shutdown")
 
+# Для совместимости с загрузчиком
 Plugin = KeyboardControlPlugin

@@ -5,7 +5,10 @@
     "PluginManagerPlugin", 
     "SystemCommandsPlugin", 
     "InputHandlerPlugin",
-    "DebugEventPlugin"],
+    "DebugEventPlugin",
+    "MouseControlPlugin",
+    "KeyboardControlPlugin"
+  ],
   "required_plugins": [
     "ConsoleInputPlugin", 
     "ConsoleOutputPlugin", 
