@@ -1,0 +1,16 @@
+{
+    "LogAnalyzer": {
+    "type": "llm",
+    "backend": "ollama",
+    "model": "llama3", 
+    "host": "http://localhost:11434",
+    "system_prompt": "Ты — эксперт по анализу логов. Тебе будут отправлять строки логов. Ищи ошибки, предупреждения и аномалии. Отвечай кратко и по делу."
+    },
+    "BaseAgent": {
+    "type": "llm",
+    "backend": "ollama",
+    "model": "deepseek-r1", 
+    "host": "http://localhost:11434",
+    "system_prompt": "Ты - личный помощник по общим вопросам, отвечай в разговорном стиле"
+    }
+}

@@ -6,8 +6,7 @@
     "SystemCommandsPlugin", 
     "InputHandlerPlugin",
     "DebugEventPlugin",
-    "MouseControlPlugin",
-    "KeyboardControlPlugin"
+    "TaskPlannerPlugin"
   ],
   "required_plugins": [
     "ConsoleInputPlugin", 
@@ -15,12 +14,16 @@
     "PluginManagerPlugin", 
     "SystemCommandsPlugin", 
     "InputHandlerPlugin"],
-  "ai_settings": {
-    "provider": "",
-    "api_key": "",
-    "model": "",
-    "max_tokens": 1000,
-    "temperature": 0.7
+    "task_planner": {
+    "model_path": "data/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+    "max_tokens": 512,
+    "temperature": 0.7,
+    "n_ctx": 2048,
+    "n_gpu_layers": 0,
+    "comment": "Set n_gpu_layers to -1 to use all available GPU layers, or 0 for CPU only"
   },
-  "yolo_confidence": 0.6
+  "system": {
+    "auto_execute_plans": false,
+    "require_confirmation": true
+  }
 }

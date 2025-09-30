@@ -18,6 +18,8 @@ project/
 │   └── plugin_base.py     # Base class for plugins
 ├── plugins/               # Directory for all plugins (built-in and user-defined)
 │   └── ExamplePlugin.py   # Example plugin
+├── data/                  # Directory for data of plugins (built-in and user-defined)
+│   └── ExampleData.txt    # Example data
 ├── config.json            # Configuration file (list of plugins and settings)
 ├── main.py                # Entry point for launching
 └── README.md              # This file

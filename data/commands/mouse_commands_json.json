@@ -1,0 +1,58 @@
+[
+  {
+    "event": "mouse_move",
+    "description": "Move mouse cursor to specified coordinates",
+    "parameters": {
+      "x": "int - X coordinate on screen",
+      "y": "int - Y coordinate on screen",
+      "duration": "float (optional) - Movement duration in seconds (default: 0.2)"
+    },
+    "example": {
+      "event": "mouse_move",
+      "data": {"x": 500, "y": 300, "duration": 0.5}
+    }
+  },
+  {
+    "event": "mouse_click",
+    "description": "Click mouse button at specified position or current position",
+    "parameters": {
+      "x": "int (optional) - X coordinate",
+      "y": "int (optional) - Y coordinate",
+      "button": "str - Button to click: 'left', 'right', or 'middle' (default: 'left')",
+      "clicks": "int - Number of clicks (default: 1)",
+      "interval": "float - Interval between clicks in seconds (default: 0.1)"
+    },
+    "example": {
+      "event": "mouse_click",
+      "data": {"x": 100, "y": 200, "button": "left", "clicks": 2}
+    }
+  },
+  {
+    "event": "mouse_drag",
+    "description": "Drag mouse from one position to another",
+    "parameters": {
+      "to_x": "int - Destination X coordinate",
+      "to_y": "int - Destination Y coordinate",
+      "from_x": "int (optional) - Start X coordinate (default: current position)",
+      "from_y": "int (optional) - Start Y coordinate (default: current position)",
+      "duration": "float - Drag duration in seconds (default: 0.5)"
+    },
+    "example": {
+      "event": "mouse_drag",
+      "data": {"from_x": 100, "from_y": 100, "to_x": 300, "to_y": 300, "duration": 1.0}
+    }
+  },
+  {
+    "event": "mouse_scroll",
+    "description": "Scroll mouse wheel up or down",
+    "parameters": {
+      "clicks": "int - Scroll amount (positive=up, negative=down)",
+      "x": "int (optional) - X coordinate to scroll at",
+      "y": "int (optional) - Y coordinate to scroll at"
+    },
+    "example": {
+      "event": "mouse_scroll",
+      "data": {"clicks": 5}
+    }
+  }
+]
